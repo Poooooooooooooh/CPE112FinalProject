@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Task Manager",
+      "type": "shell",
+      "command": "gcc",
+      "args": [
+        "main.c",
+        "TaskManager.c",
+        "-g",
+        "-o",
+        "task_manager.exe"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"]
+    }
+  ]
+}

@@ -7,6 +7,7 @@ int main(void) {
     int nextId = 1;
     int running = 1;
     char name[MAX_NAME_LENGTH];
+    char deadline[MAX_DEADLINE_LENGTH];
     int priority;
 
     while (running) {
@@ -16,9 +17,8 @@ int main(void) {
         printf("3. Delete task\n");
         printf("4. Undo delete\n");
         printf("5. Sort by priority\n");
-        printf("6. Search task\n");
-        printf("7. Save tasks\n");
-        printf("8. Load tasks\n");
+        printf("6. Sort by deadline\n");
+        printf("7. Search task\n");
         printf("0. Exit\n");
         printf("Choose an option: ");
 
@@ -32,6 +32,9 @@ int main(void) {
                 printf("Enter task name: ");
                 scanf(" %79[^\n]", name);
 
+                printf("Enter deadline (DD-MM-YYYY): ");
+                scanf(" %10s", deadline);
+
                 printf("Enter priority (1-5): ");
                 if (scanf("%d", &priority) != 1) {
                     printf("Invalid priority input.\n");
@@ -43,7 +46,7 @@ int main(void) {
                     break;
                 }
 
-                addTask(&taskList, &nextId, name, priority);
+                addTask(&taskList, &nextId, name, deadline, priority);
                 printf("Task added.\n");
                 break;
             case 2:
@@ -59,13 +62,11 @@ int main(void) {
                 printf("Sort by priority is not implemented yet.\n");
                 break;
             case 6:
-                printf("Search task is not implemented yet.\n");
+                sortTasksByDeadline(&taskList);
+                printf("Tasks sorted by nearest deadline.\n");
                 break;
             case 7:
-                printf("Save tasks is not implemented yet.\n");
-                break;
-            case 8:
-                printf("Load tasks is not implemented yet.\n");
+                printf("Search task is not implemented yet.\n");
                 break;
             case 0:
                 running = 0;
