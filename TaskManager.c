@@ -1,50 +1,54 @@
-#include <stdio.h>
 #include "TaskManager.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#define TASKS_FILE "tasks.txt"
+void addTask(Task **head, int *nextId, const char name[], int priority) {
+    Task *newTask = (Task *)malloc(sizeof(Task));
+    Task *current;
 
-int loadTasks(Task tasks[], int *count, int *nextId) {
-    FILE *file = fopen(TASKS_FILE, "r");
-    int maxId = 0;
-
-    *count = 0;
-    *nextId = 1;
-
-    if (file == NULL) {
-        return 0;
+    if (newTask == NULL) {
+        printf("Unable to add task. Memory allocation failed.\n");
+        return;
     }
 
-    while (*count < MAX_TASKS &&
-           fscanf(file, " %d|%79[^|]|%d",
-                  &tasks[*count].id,
-                  tasks[*count].name,
-                  &tasks[*count].done) == 3) {
-        if (tasks[*count].id > maxId) {
-            maxId = tasks[*count].id;
+    newTask->id = *nextId;
+    strncpy(newTask->name, name, MAX_NAME_LENGTH - 1);
+    newTask->name[MAX_NAME_LENGTH - 1] = '\0';
+    newTask->priority = priority;
+    newTask->done = 0;
+    newTask->next = NULL;
+
+    if (*head == NULL) {
+        *head = newTask;
+    } else {
+        current = *head;
+        while (current->next != NULL) {
+            current = current->next;
         }
-
-        (*count)++;
+        current->next = newTask;
     }
 
-    *nextId = maxId + 1;
-    fclose(file);
-
-    return 1;
+    (*nextId)++;
 }
 
-int saveTasks(Task tasks[], int count) {
-    FILE *file = fopen(TASKS_FILE, "w");
-    int i;
+void displayTasks(Task *head) {
+    Task *current = head;
 
-    if (file == NULL) {
-        return 0;
+    if (current == NULL) {
+        printf("\nNo tasks available.\n");
+        return;
     }
 
-    for (i = 0; i < count; i++) {
-        fprintf(file, "%d|%s|%d\n", tasks[i].id, tasks[i].name, tasks[i].done);
+    printf("\n%-5s %-40s %-10s %-10s\n", "ID", "Name", "Priority", "Status");
+    printf("---------------------------------------------------------------------\n");
+
+    while (current != NULL) {
+        printf("%-5d %-40s %-10d %-10s\n",
+               current->id,
+               current->name,
+               current->priority,
+               current->done ? "Done" : "Pending");
+        current = current->next;
     }
-
-    fclose(file);
-
-    return 1;
 }
