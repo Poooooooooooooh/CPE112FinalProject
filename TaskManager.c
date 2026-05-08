@@ -68,6 +68,36 @@ void displayTasks(Task *head) {
     }
 }
 
+void sortTasksByPriority(Task **head) {
+    int swapped;
+    Task **current;
+    Task *first;
+    Task *second;
+
+    if (head == NULL || *head == NULL) {
+        return;
+    }
+
+    do {
+        swapped = 0;
+        current = head;
+
+        while ((*current)->next != NULL) {
+            first = *current;
+            second = first->next;
+
+            if (first->priority < second->priority) {
+                first->next = second->next;
+                second->next = first;
+                *current = second;
+                swapped = 1;
+            }
+
+            current = &((*current)->next);
+        }
+    } while (swapped);
+}
+
 void sortTasksByDeadline(Task **head) {
     int swapped;
     Task **current;

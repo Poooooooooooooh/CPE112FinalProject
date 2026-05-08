@@ -59,7 +59,8 @@ int main(void) {
                 printf("Undo delete is not implemented yet.\n");
                 break;
             case 5:
-                printf("Sort by priority is not implemented yet.\n");
+                sortTasksByPriority(&taskList);
+                printf("Tasks sorted by priority.\n");
                 break;
             case 6:
                 sortTasksByDeadline(&taskList);
