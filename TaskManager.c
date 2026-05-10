@@ -68,6 +68,89 @@ void displayTasks(Task *head) {
     }
 }
 
+void deleteTask(Task **head, UndoNode **undoStack, int id) {
+    Task *current;
+    Task *previous;
+    UndoNode *deletedTask;
+
+    if (head == NULL || *head == NULL) {
+        printf("No tasks available to delete.\n");
+        return;
+    }
+
+    current = *head;
+    previous = NULL;
+
+    while (current != NULL && current->id != id) {
+        previous = current;
+        current = current->next;
+    }
+
+    if (current == NULL) {
+        printf("Task with ID %d was not found.\n", id);
+        return;
+    }
+
+    deletedTask = (UndoNode *)malloc(sizeof(UndoNode));
+    if (deletedTask == NULL) {
+        printf("Unable to delete task. Memory allocation failed.\n");
+        return;
+    }
+
+    deletedTask->id = current->id;
+    strncpy(deletedTask->name, current->name, MAX_NAME_LENGTH - 1);
+    deletedTask->name[MAX_NAME_LENGTH - 1] = '\0';
+    strncpy(deletedTask->deadline, current->deadline, MAX_DEADLINE_LENGTH - 1);
+    deletedTask->deadline[MAX_DEADLINE_LENGTH - 1] = '\0';
+    deletedTask->priority = current->priority;
+    deletedTask->done = current->done;
+
+    deletedTask->next = *undoStack;
+    *undoStack = deletedTask;
+
+    if (previous == NULL) {
+        *head = current->next;
+    } else {
+        previous->next = current->next;
+    }
+
+    free(current);
+    printf("Task deleted.\n");
+}
+
+void undoDelete(Task **head, UndoNode **undoStack) {
+    UndoNode *top;
+    Task *restoredTask;
+
+    if (undoStack == NULL || *undoStack == NULL) {
+        printf("No deleted task to undo.\n");
+        return;
+    }
+
+    restoredTask = (Task *)malloc(sizeof(Task));
+    if (restoredTask == NULL) {
+        printf("Unable to undo delete. Memory allocation failed.\n");
+        return;
+    }
+
+    top = *undoStack;
+    *undoStack = top->next;
+
+    restoredTask->id = top->id;
+    strncpy(restoredTask->name, top->name, MAX_NAME_LENGTH - 1);
+    restoredTask->name[MAX_NAME_LENGTH - 1] = '\0';
+    strncpy(restoredTask->deadline, top->deadline, MAX_DEADLINE_LENGTH - 1);
+    restoredTask->deadline[MAX_DEADLINE_LENGTH - 1] = '\0';
+    restoredTask->priority = top->priority;
+    restoredTask->done = top->done;
+
+    restoredTask->next = *head;
+    *head = restoredTask;
+
+    free(top);
+    printf("Deleted task restored.\n");
+}
+
 void sortTasksByPriority(Task **head) {
     int swapped;
     Task **current;

@@ -3,7 +3,9 @@
 
 int main(void) {
     Task *taskList = NULL;
+    UndoNode *undoStack = NULL;
     int choice;
+    int id;
     int nextId = 1;
     int running = 1;
     char name[MAX_NAME_LENGTH];
@@ -53,10 +55,16 @@ int main(void) {
                 displayTasks(taskList);
                 break;
             case 3:
-                printf("Delete task is not implemented yet.\n");
+                printf("Enter task ID to delete: ");
+                if (scanf("%d", &id) != 1) {
+                    printf("Invalid task ID input.\n");
+                    return 1;
+                }
+
+                deleteTask(&taskList, &undoStack, id);
                 break;
             case 4:
-                printf("Undo delete is not implemented yet.\n");
+                undoDelete(&taskList, &undoStack);
                 break;
             case 5:
                 sortTasksByPriority(&taskList);
