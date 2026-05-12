@@ -3,23 +3,29 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int deadlineValue(const char deadline[]) {
+#define TASKS_FILE "tasks.txt"
+
+static int deadlineValue(const char deadline[])
+{
     int day;
     int month;
     int year;
 
-    if (sscanf(deadline, "%d-%d-%d", &day, &month, &year) != 3) {
+    if (sscanf(deadline, "%d-%d-%d", &day, &month, &year) != 3)
+    {
         return 99999999;
     }
 
     return (year * 10000) + (month * 100) + day;
 }
 
-void addTask(Task **head, int *nextId, const char name[], const char deadline[], int priority) {
+void addTask(Task **head, int *nextId, const char name[], const char deadline[], int priority)
+{
     Task *newTask = (Task *)malloc(sizeof(Task));
     Task *current;
 
-    if (newTask == NULL) {
+    if (newTask == NULL)
+    {
         printf("Unable to add task. Memory allocation failed.\n");
         return;
     }
@@ -33,11 +39,15 @@ void addTask(Task **head, int *nextId, const char name[], const char deadline[],
     newTask->done = 0;
     newTask->next = NULL;
 
-    if (*head == NULL) {
+    if (*head == NULL)
+    {
         *head = newTask;
-    } else {
+    }
+    else
+    {
         current = *head;
-        while (current->next != NULL) {
+        while (current->next != NULL)
+        {
             current = current->next;
         }
         current->next = newTask;
@@ -46,10 +56,12 @@ void addTask(Task **head, int *nextId, const char name[], const char deadline[],
     (*nextId)++;
 }
 
-void displayTasks(Task *head) {
+void displayTasks(Task *head)
+{
     Task *current = head;
 
-    if (current == NULL) {
+    if (current == NULL)
+    {
         printf("\nNo tasks available.\n");
         return;
     }
@@ -57,7 +69,8 @@ void displayTasks(Task *head) {
     printf("\n%-5s %-30s %-18s %-10s %-10s\n", "ID", "Name", "Deadline", "Priority", "Status");
     printf("--------------------------------------------------------------------------------\n");
 
-    while (current != NULL) {
+    while (current != NULL)
+    {
         printf("%-5d %-30s %-18s %-10d %-10s\n",
                current->id,
                current->name,
@@ -68,12 +81,14 @@ void displayTasks(Task *head) {
     }
 }
 
-void deleteTask(Task **head, UndoNode **undoStack, int id) {
+void deleteTask(Task **head, UndoNode **undoStack, int id)
+{
     Task *current;
     Task *previous;
     UndoNode *deletedTask;
 
-    if (head == NULL || *head == NULL) {
+    if (head == NULL || *head == NULL)
+    {
         printf("No tasks available to delete.\n");
         return;
     }
@@ -81,18 +96,21 @@ void deleteTask(Task **head, UndoNode **undoStack, int id) {
     current = *head;
     previous = NULL;
 
-    while (current != NULL && current->id != id) {
+    while (current != NULL && current->id != id)
+    {
         previous = current;
         current = current->next;
     }
 
-    if (current == NULL) {
+    if (current == NULL)
+    {
         printf("Task with ID %d was not found.\n", id);
         return;
     }
 
     deletedTask = (UndoNode *)malloc(sizeof(UndoNode));
-    if (deletedTask == NULL) {
+    if (deletedTask == NULL)
+    {
         printf("Unable to delete task. Memory allocation failed.\n");
         return;
     }
@@ -108,9 +126,12 @@ void deleteTask(Task **head, UndoNode **undoStack, int id) {
     deletedTask->next = *undoStack;
     *undoStack = deletedTask;
 
-    if (previous == NULL) {
+    if (previous == NULL)
+    {
         *head = current->next;
-    } else {
+    }
+    else
+    {
         previous->next = current->next;
     }
 
@@ -118,17 +139,20 @@ void deleteTask(Task **head, UndoNode **undoStack, int id) {
     printf("Task deleted.\n");
 }
 
-void undoDelete(Task **head, UndoNode **undoStack) {
+void undoDelete(Task **head, UndoNode **undoStack)
+{
     UndoNode *top;
     Task *restoredTask;
 
-    if (undoStack == NULL || *undoStack == NULL) {
+    if (undoStack == NULL || *undoStack == NULL)
+    {
         printf("No deleted task to undo.\n");
         return;
     }
 
     restoredTask = (Task *)malloc(sizeof(Task));
-    if (restoredTask == NULL) {
+    if (restoredTask == NULL)
+    {
         printf("Unable to undo delete. Memory allocation failed.\n");
         return;
     }
@@ -151,25 +175,30 @@ void undoDelete(Task **head, UndoNode **undoStack) {
     printf("Deleted task restored.\n");
 }
 
-void sortTasksByPriority(Task **head) {
+void sortTasksByPriority(Task **head)
+{
     int swapped;
     Task **current;
     Task *first;
     Task *second;
 
-    if (head == NULL || *head == NULL) {
+    if (head == NULL || *head == NULL)
+    {
         return;
     }
 
-    do {
+    do
+    {
         swapped = 0;
         current = head;
 
-        while ((*current)->next != NULL) {
+        while ((*current)->next != NULL)
+        {
             first = *current;
             second = first->next;
 
-            if (first->priority < second->priority) {
+            if (first->priority < second->priority)
+            {
                 first->next = second->next;
                 second->next = first;
                 *current = second;
@@ -181,25 +210,30 @@ void sortTasksByPriority(Task **head) {
     } while (swapped);
 }
 
-void sortTasksByDeadline(Task **head) {
+void sortTasksByDeadline(Task **head)
+{
     int swapped;
     Task **current;
     Task *first;
     Task *second;
 
-    if (head == NULL || *head == NULL) {
+    if (head == NULL || *head == NULL)
+    {
         return;
     }
 
-    do {
+    do
+    {
         swapped = 0;
         current = head;
 
-        while ((*current)->next != NULL) {
+        while ((*current)->next != NULL)
+        {
             first = *current;
             second = first->next;
 
-            if (deadlineValue(first->deadline) > deadlineValue(second->deadline)) {
+            if (deadlineValue(first->deadline) > deadlineValue(second->deadline))
+            {
                 first->next = second->next;
                 second->next = first;
                 *current = second;
@@ -209,4 +243,154 @@ void sortTasksByDeadline(Task **head) {
             current = &((*current)->next);
         }
     } while (swapped);
+}
+
+Task *searchTask(Task *head, const char name[])
+{
+    Task *current = head;
+
+    while (current != NULL)
+    {
+        if (strcmp(current->name, name) == 0)
+        {
+            return current;
+        }
+
+        current = current->next;
+    }
+
+    return NULL;
+}
+
+int saveTasks(Task *head)
+{
+    FILE *file = fopen(TASKS_FILE, "w");
+    Task *current = head;
+
+    if (file == NULL)
+    {
+        printf("Unable to save tasks.\n");
+        return 0;
+    }
+
+    while (current != NULL)
+    {
+        fprintf(file, "%d|%s|%s|%d|%d\n",
+                current->id,
+                current->name,
+                current->deadline,
+                current->priority,
+                current->done);
+        current = current->next;
+    }
+
+    fclose(file);
+    return 1;
+}
+
+int loadTasks(Task **head, int *nextId)
+{
+    FILE *file;
+    Task *tail = NULL;
+    char line[160];
+    int highestId = 0;
+
+    if (head == NULL || nextId == NULL)
+    {
+        return 0;
+    }
+
+    file = fopen(TASKS_FILE, "r");
+    if (file == NULL)
+    {
+        *nextId = 1;
+        return 1;
+    }
+
+    while (fgets(line, sizeof(line), file) != NULL)
+    {
+        Task *newTask = (Task *)malloc(sizeof(Task));
+
+        if (newTask == NULL)
+        {
+            printf("Unable to load all tasks. Memory allocation failed.\n");
+            fclose(file);
+            return 0;
+        }
+
+        newTask->next = NULL;
+
+        if (sscanf(line, "%d|%79[^|]|%10[^|]|%d|%d",
+                   &newTask->id,
+                   newTask->name,
+                   newTask->deadline,
+                   &newTask->priority,
+                   &newTask->done) != 5)
+        {
+            free(newTask);
+            continue;
+        }
+
+        if (*head == NULL)
+        {
+            *head = newTask;
+        }
+        else
+        {
+            tail->next = newTask;
+        }
+
+        tail = newTask;
+
+        if (newTask->id > highestId)
+        {
+            highestId = newTask->id;
+        }
+    }
+
+    fclose(file);
+    *nextId = highestId + 1;
+    return 1;
+}
+
+void freeTasks(Task **head)
+{
+    Task *current;
+    Task *next;
+
+    if (head == NULL)
+    {
+        return;
+    }
+
+    current = *head;
+    while (current != NULL)
+    {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+
+    *head = NULL;
+}
+
+void freeUndoStack(UndoNode **undoStack)
+{
+    UndoNode *current;
+    UndoNode *next;
+
+    if (undoStack == NULL)
+    {
+        return;
+    }
+
+    current = *undoStack;
+    while (current != NULL)
+    {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+
+    *undoStack = NULL;
 }
