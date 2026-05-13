@@ -29,6 +29,7 @@ void undoDelete(Task **head, UndoNode **undoStack);
 void sortTasksByPriority(Task **head);
 void sortTasksByDeadline(Task **head);
 Task *searchTask(Task *head, const char name[]);
+int isValidDeadline(const char deadline[]);
 int saveTasks(Task *head);
 int loadTasks(Task **head, int *nextId);
 void freeTasks(Task **head);

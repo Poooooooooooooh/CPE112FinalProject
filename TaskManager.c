@@ -5,13 +5,73 @@
 
 #define TASKS_FILE "tasks.txt"
 
+static int isLeapYear(int year)
+{
+    return (year % 400 == 0) || (year % 4 == 0 && year % 100 != 0);
+}
+
+static int parseDeadline(const char deadline[], int *day, int *month, int *year)
+{
+    int i;
+    int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    if (strlen(deadline) != 10 || deadline[2] != '-' || deadline[5] != '-')
+    {
+        return 0;
+    }
+
+    for (i = 0; i < 10; i++)
+    {
+        if (i == 2 || i == 5)
+        {
+            continue;
+        }
+
+        if (deadline[i] < '0' || deadline[i] > '9')
+        {
+            return 0;
+        }
+    }
+
+    *day = ((deadline[0] - '0') * 10) + (deadline[1] - '0');
+    *month = ((deadline[3] - '0') * 10) + (deadline[4] - '0');
+    *year = ((deadline[6] - '0') * 1000) + ((deadline[7] - '0') * 100) +
+            ((deadline[8] - '0') * 10) + (deadline[9] - '0');
+
+    if (*year < 1 || *month < 1 || *month > 12)
+    {
+        return 0;
+    }
+
+    if (*month == 2 && isLeapYear(*year))
+    {
+        daysInMonth[1] = 29;
+    }
+
+    if (*day < 1 || *day > daysInMonth[*month - 1])
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+int isValidDeadline(const char deadline[])
+{
+    int day;
+    int month;
+    int year;
+
+    return parseDeadline(deadline, &day, &month, &year);
+}
+
 static int deadlineValue(const char deadline[])
 {
     int day;
     int month;
     int year;
 
-    if (sscanf(deadline, "%d-%d-%d", &day, &month, &year) != 3)
+    if (!parseDeadline(deadline, &day, &month, &year))
     {
         return 99999999;
     }
