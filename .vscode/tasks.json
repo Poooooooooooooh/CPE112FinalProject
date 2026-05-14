@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "C/C++: gcc.exe build active file",
+      "type": "shell",
+      "command": "C:/TDM-GCC-64/bin/gcc.exe",
+      "args": [
+        "main.c",
+        "TaskManager.c",
+        "-g",
+        "-o",
+        "task_manager.exe"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "Build Task Manager",
+      "dependsOn": "C/C++: gcc.exe build active file",
+      "problemMatcher": []
+    }
+  ]
+}
