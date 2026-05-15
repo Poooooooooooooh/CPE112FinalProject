@@ -1,4 +1,4 @@
-﻿# CPE112 Final Project: Task Management System
+# CPE112 Final Project: Task Management System
 
 ## Project Description
 This project is a menu-driven task management system implemented in C. It helps users manage tasks by adding, deleting, searching, displaying, sorting, and restoring recently deleted tasks. The system also saves task data to `tasks.txt` so the task list can be loaded again when the program restarts.
@@ -17,9 +17,9 @@ The project applies dynamic memory, pointers, linked lists, stack behavior, modu
 - Validate deadline format as `DD-MM-YYYY`
 
 ## Team Members
-- Chaiwat  Mitranon          68070503416
-- Phrommin Gatwatananitiporn 68070503442
-- Phudit   Wongviriyasit     68070503447
+- Chaiwat Mitranon -           68070503416 - GitHub: `winnchaiwat-hash`
+- Phrommin Gatwatananitiporn - 68070503442 - GitHub: `chokub`
+- Phudit Wongviriyasit -       68070503447 - GitHub: `Poooooooooooooh`
 
 
 ## How to Run
@@ -53,6 +53,8 @@ Then follow the menu options shown in the command-line interface.
 - Dynamic memory and pointers: `malloc`, `free`, `Task *`, `UndoNode *`
 - Modular functions: task operations are separated into `TaskManager.c` and declared in `TaskManager.h`
 - Menu-driven program: `main.c` provides a repeated user menu
+- Input validation: `main.c` validates menu choices, deadline format, priority range, and task IDs
+- File persistence: `saveTasks` and `loadTasks` store and restore task data from `tasks.txt`
 
 ## Data Structures Used
 
@@ -131,14 +133,99 @@ Time complexity: `O(1)` because the deadline string length is fixed.
 
 ## Sample Input / Output
 
-Example actions:
-- Add a task: enter task name, deadline in `DD-MM-YYYY`, and priority from 1 to 5
-- Display tasks: show all tasks in the current linked list
-- Search task: enter an exact task name
-- Delete task: enter task ID
-- Undo delete: restore the most recently deleted task
-- Sort by priority: higher priority appears first
-- Sort by deadline: nearest deadline appears first
+### Main Menu
+
+```text
+========== Task Management System ==========
+1. Add Task
+2. Display Tasks
+3. Delete Task
+4. Undo Delete
+5. Sort Tasks by Priority
+6. Sort Tasks by Deadline
+7. Search Task
+0. Save and Exit
+Choose an option:
+```
+
+### Add Task with Validation
+
+```text
+Choose an option: 1
+Enter task name: Study Data Structures
+Enter deadline (DD-MM-YYYY only, include hyphens): 15052026
+Invalid deadline. Please use DD-MM-YYYY format only.
+Enter deadline (DD-MM-YYYY only, include hyphens): 15-05-2026
+Enter priority (1-5): 8
+Priority must be between 1 and 5.
+Enter priority (1-5): 2
+Task added.
+```
+
+### Display Tasks
+
+```text
+Choose an option: 2
+
+ID    Name                           Deadline           Priority   Status
+--------------------------------------------------------------------------------
+1     Study Data Structures           15-05-2026         2          Pending
+```
+
+### Search Task
+
+```text
+Choose an option: 7
+Enter task name to search (0 to cancel): Study Data Structures
+
+ID    Name                           Deadline           Priority   Status
+--------------------------------------------------------------------------------
+1     Study Data Structures           15-05-2026         2          Pending
+```
+
+### Delete and Undo
+
+```text
+Choose an option: 3
+Enter task ID to delete (0 to cancel): 1
+Task deleted.
+
+Choose an option: 4
+Deleted task restored.
+```
+
+### Sort Tasks
+
+```text
+Choose an option: 5
+Tasks sorted by priority.
+
+Choose an option: 6
+Tasks sorted by nearest deadline.
+```
+
+### Save and Exit
+
+```text
+Choose an option: 0
+Tasks saved. Goodbye.
+```
+
+## Key Code Explanation
+
+- `main.c` controls the menu loop, reads user input, validates invalid values, and calls task operations.
+- `clearInput` removes leftover characters from the input buffer after invalid input.
+- `addTask` dynamically allocates a new `Task` node and appends it to the linked list.
+- `deleteTask` removes a task by ID and pushes its data onto the undo stack.
+- `undoDelete` pops the most recently deleted task from the stack and restores it to the task list.
+- `searchTask` performs linear search by exact task name.
+- `mergeSortTasks` sorts linked-list nodes by changing pointers instead of copying task data.
+- `saveTasks` and `loadTasks` use file I/O to preserve task data between program runs.
+- `freeTasks` and `freeUndoStack` release dynamically allocated memory before the program exits.
+
+## GitHub Contribution Evidence
+
+The repository commit history shows work from multiple GitHub accounts. Each member is expected to understand the full codebase and be able to explain the data structures, algorithms, and menu flow during the presentation.
 
 ## Limitations and Future Improvements
 - Search currently requires an exact task name
