@@ -220,17 +220,16 @@ void displayTasks(Task *head)
         return;
     }
 
-    printf("\n%-5s %-30s %-18s %-10s %-10s\n", "ID", "Name", "Deadline", "Priority", "Status");
-    printf("--------------------------------------------------------------------------------\n");
+    printf("\n%-5s %-30s %-18s %-10s\n", "ID", "Name", "Deadline", "Priority");
+    printf("------------------------------------------------------------------\n");
 
     while (current != NULL)
     {
-        printf("%-5d %-30s %-18s %-10d %-10s\n",
+        printf("%-5d %-30s %-18s %-10d\n",
                current->id,
                current->name,
                current->deadline,
-               current->priority,
-               current->done ? "Done" : "Pending");
+               current->priority);
         current = current->next;
     }
 }

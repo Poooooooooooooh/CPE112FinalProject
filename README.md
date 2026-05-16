@@ -59,7 +59,7 @@ Then follow the menu options shown in the command-line interface.
 ## Data Structures Used
 
 ### 1. Singly Linked List
-The main task list uses a singly linked list. Each `Task` node stores the task ID, name, deadline, priority, status, and a pointer to the next task.
+The main task list uses a singly linked list. Each `Task` node stores the task ID, name, deadline, priority, and a pointer to the next task.
 
 Why this structure is suitable:
 The number of tasks is not fixed. A linked list can grow and shrink during runtime through dynamic memory allocation.
@@ -136,15 +136,15 @@ Time complexity: `O(1)` because the deadline string length is fixed.
 ### Main Menu
 
 ```text
-========== Task Management System ==========
-1. Add Task
-2. Display Tasks
-3. Delete Task
-4. Undo Delete
-5. Sort Tasks by Priority
-6. Sort Tasks by Deadline
-7. Search Task
-0. Save and Exit
+Task Management System
+1. Add task
+2. Display tasks
+3. Delete task
+4. Undo delete
+5. Sort by priority
+6. Sort by deadline
+7. Search task
+0. Exit
 Choose an option:
 ```
 
@@ -152,13 +152,13 @@ Choose an option:
 
 ```text
 Choose an option: 1
-Enter task name: Study Data Structures
-Enter deadline (DD-MM-YYYY only, include hyphens): 15052026
-Invalid deadline. Please use DD-MM-YYYY format only.
-Enter deadline (DD-MM-YYYY only, include hyphens): 15-05-2026
-Enter priority (1-5): 8
+Enter task name (or type cancel to return): Study Data Structures
+Enter deadline (DD-MM-YYYY) or type cancel to return: 15052026
+Invalid deadline format.
+Enter deadline (DD-MM-YYYY) or type cancel to return: 15-05-2026
+Enter priority (1-5) or type cancel to return: 8
 Priority must be between 1 and 5.
-Enter priority (1-5): 2
+Enter priority (1-5) or type cancel to return: 2
 Task added.
 ```
 
@@ -167,27 +167,27 @@ Task added.
 ```text
 Choose an option: 2
 
-ID    Name                           Deadline           Priority   Status
---------------------------------------------------------------------------------
-1     Study Data Structures           15-05-2026         2          Pending
+ID    Name                           Deadline           Priority
+------------------------------------------------------------------
+1     Study Data Structures           15-05-2026         2
 ```
 
 ### Search Task
 
 ```text
 Choose an option: 7
-Enter task name to search (0 to cancel): Study Data Structures
+Enter task name to search (or type cancel to return): Study Data Structures
 
-ID    Name                           Deadline           Priority   Status
---------------------------------------------------------------------------------
-1     Study Data Structures           15-05-2026         2          Pending
+ID    Name                           Deadline           Priority
+------------------------------------------------------------------
+1     Study Data Structures           15-05-2026         2
 ```
 
 ### Delete and Undo
 
 ```text
 Choose an option: 3
-Enter task ID to delete (0 to cancel): 1
+Enter task ID to delete (or type cancel to return): 1
 Task deleted.
 
 Choose an option: 4
@@ -204,17 +204,16 @@ Choose an option: 6
 Tasks sorted by nearest deadline.
 ```
 
-### Save and Exit
+### Exit
 
 ```text
 Choose an option: 0
-Tasks saved. Goodbye.
 ```
 
 ## Key Code Explanation
 
 - `main.c` controls the menu loop, reads user input, validates invalid values, and calls task operations.
-- `clearInput` removes leftover characters from the input buffer after invalid input.
+- `readLine` reads user input safely and removes the trailing newline.
 - `addTask` dynamically allocates a new `Task` node and appends it to the linked list.
 - `deleteTask` removes a task by ID and pushes its data onto the undo stack.
 - `undoDelete` pops the most recently deleted task from the stack and restores it to the task list.

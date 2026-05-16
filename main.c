@@ -1,49 +1,40 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "TaskManager.h"
 
-static void clearInput(void)
+static int readLine(char *buffer, int size)
 {
-    int ch;
-
-    while ((ch = getchar()) != '\n' && ch != EOF)
+    if (fgets(buffer, size, stdin) == NULL)
     {
+        return 0;
     }
+
+    size_t len = strlen(buffer);
+    if (len > 0 && buffer[len - 1] == '\n')
+    {
+        buffer[len - 1] = '\0';
+    }
+    else
+    {
+        int ch;
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+    }
+
+    return 1;
 }
 
-static int taskIdExists(Task *head, int id)
+static int isCancelInput(const char *input)
 {
-    Task *current = head;
-
-    while (current != NULL)
-    {
-        if (current->id == id)
-        {
-            return 1;
-        }
-
-        current = current->next;
-    }
-
-    return 0;
-}
-
-static int readInt(const char prompt[], const char errorMessage[])
-{
-    int value;
-
-    while (1)
-    {
-        printf("%s", prompt);
-        if (scanf("%d", &value) == 1)
-        {
-            clearInput();
-            return value;
-        }
-
-        printf("%s\n", errorMessage);
-        clearInput();
-    }
+    return input != NULL &&
+           ((input[0] == 'c' || input[0] == 'C') &&
+            (input[1] == 'a' || input[1] == 'A') &&
+            (input[2] == 'n' || input[2] == 'N') &&
+            (input[3] == 'c' || input[3] == 'C') &&
+            (input[4] == 'e' || input[4] == 'E') &&
+            (input[5] == 'l' || input[5] == 'L') &&
+            input[6] == '\0');
 }
 
 int main(void)
@@ -56,66 +47,96 @@ int main(void)
     int running = 1;
     char name[MAX_NAME_LENGTH];
     char deadline[MAX_DEADLINE_LENGTH];
-    char deadlineInput[MAX_NAME_LENGTH];
+    char input[32];
     int priority;
-    int cancelled;
     Task *foundTask;
 
     loadTasks(&taskList, &nextId);
 
     while (running)
     {
-        printf("\n========== Task Management System ==========\n");
-        printf("1. Add Task\n");
-        printf("2. Display Tasks\n");
-        printf("3. Delete Task\n");
-        printf("4. Undo Delete\n");
-        printf("5. Sort Tasks by Priority\n");
-        printf("6. Sort Tasks by Deadline\n");
-        printf("7. Search Task\n");
-        printf("0. Save and Exit\n");
+        printf("\nTask Management System\n");
+        printf("1. Add task\n");
+        printf("2. Display tasks\n");
+        printf("3. Delete task\n");
+        printf("4. Undo delete\n");
+        printf("5. Sort by priority\n");
+        printf("6. Sort by deadline\n");
+        printf("7. Search task\n");
+        printf("0. Exit\n");
+        printf("Choose an option: ");
 
-        do
+        if (!readLine(input, sizeof(input)) || sscanf(input, "%d", &choice) != 1)
         {
-            choice = readInt("Choose an option: ",
-                             "Invalid input. Please enter a number from 0 to 7.");
-
-            if (choice < 0 || choice > 7)
-            {
-                printf("Invalid option. Please choose 0 to 7.\n");
-            }
-        } while (choice < 0 || choice > 7);
+            printf("Invalid input.\n");
+            continue;
+        }
 
         switch (choice)
         {
         case 1:
-            printf("Enter task name: ");
-            scanf(" %79[^\n]", name);
-            clearInput();
-
-            do
+            printf("Enter task name (or type cancel to return): ");
+            if (!readLine(name, sizeof(name)))
             {
-                printf("Enter deadline (DD-MM-YYYY only, include hyphens): ");
-                scanf(" %79s", deadlineInput);
-                clearInput();
+                printf("Invalid input.\n");
+                break;
+            }
 
-                if (!isValidDeadline(deadlineInput))
-                {
-                    printf("Invalid deadline. Please use DD-MM-YYYY format only.\n");
-                }
-            } while (!isValidDeadline(deadlineInput));
-            strcpy(deadline, deadlineInput);
-
-            do
+            if (isCancelInput(name))
             {
-                priority = readInt("Enter priority (1-5): ",
-                                   "Invalid priority input. Please enter a number from 1 to 5.");
+                printf("Add task canceled.\n");
+                break;
+            }
 
-                if (priority < 1 || priority > 5)
-                {
-                    printf("Priority must be between 1 and 5.\n");
-                }
-            } while (priority < 1 || priority > 5);
+            if (name[0] == '\0')
+            {
+                printf("Task name cannot be empty.\n");
+                break;
+            }
+
+            printf("Enter deadline (DD-MM-YYYY) or type cancel to return: ");
+            if (!readLine(deadline, sizeof(deadline)))
+            {
+                printf("Invalid input.\n");
+                break;
+            }
+
+            if (isCancelInput(deadline))
+            {
+                printf("Add task canceled.\n");
+                break;
+            }
+
+            if (!isValidDeadline(deadline))
+            {
+                printf("Invalid deadline format.\n");
+                break;
+            }
+
+            printf("Enter priority (1-5) or type cancel to return: ");
+            if (!readLine(input, sizeof(input)))
+            {
+                printf("Invalid input.\n");
+                break;
+            }
+
+            if (isCancelInput(input))
+            {
+                printf("Add task canceled.\n");
+                break;
+            }
+
+            if (sscanf(input, "%d", &priority) != 1)
+            {
+                printf("Invalid priority input.\n");
+                break;
+            }
+
+            if (priority < 1 || priority > 5)
+            {
+                printf("Priority must be between 1 and 5.\n");
+                break;
+            }
 
             addTask(&taskList, &nextId, name, deadline, priority);
             saveTasks(taskList);
@@ -125,33 +146,22 @@ int main(void)
             displayTasks(taskList);
             break;
         case 3:
-            if (taskList == NULL)
+            printf("Enter task ID to delete (or type cancel to return): ");
+            if (!readLine(input, sizeof(input)))
             {
-                printf("No tasks available to delete.\n");
+                printf("Invalid input.\n");
                 break;
             }
 
-            cancelled = 0;
-            do
+            if (isCancelInput(input))
             {
-                id = readInt("Enter task ID to delete (0 to cancel): ",
-                             "Invalid task ID input. Please enter a number.");
+                printf("Delete canceled.\n");
+                break;
+            }
 
-                if (id == 0)
-                {
-                    cancelled = 1;
-                    break;
-                }
-
-                if (!taskIdExists(taskList, id))
-                {
-                    printf("Task with ID %d was not found. Please try again.\n", id);
-                }
-            } while (!taskIdExists(taskList, id));
-
-            if (cancelled)
+            if (sscanf(input, "%d", &id) != 1)
             {
-                printf("Delete cancelled.\n");
+                printf("Invalid task ID input.\n");
                 break;
             }
 
@@ -175,56 +185,42 @@ int main(void)
             displayTasks(taskList);
             break;
         case 7:
-            if (taskList == NULL)
+            printf("Enter task name to search (or type cancel to return): ");
+            if (!readLine(name, sizeof(name)))
             {
-                printf("No tasks available to search.\n");
+                printf("Invalid input.\n");
                 break;
             }
 
-            cancelled = 0;
-            do
+            if (isCancelInput(name))
             {
-                printf("Enter task name to search (0 to cancel): ");
-                scanf(" %79[^\n]", name);
-                clearInput();
-
-                if (strcmp(name, "0") == 0)
-                {
-                    cancelled = 1;
-                    break;
-                }
-
-                foundTask = searchTask(taskList, name);
-                if (foundTask == NULL)
-                {
-                    printf("Task named \"%s\" was not found. Please try again.\n", name);
-                }
-            } while (foundTask == NULL);
-
-            if (cancelled)
-            {
-                printf("Search cancelled.\n");
+                printf("Search canceled.\n");
                 break;
             }
 
-            printf("\n%-5s %-30s %-18s %-10s %-10s\n", "ID", "Name", "Deadline", "Priority", "Status");
-            printf("--------------------------------------------------------------------------------\n");
-            printf("%-5d %-30s %-18s %-10d %-10s\n",
-                   foundTask->id,
-                   foundTask->name,
-                   foundTask->deadline,
-                   foundTask->priority,
-                   foundTask->done ? "Done" : "Pending");
+            foundTask = searchTask(taskList, name);
+            if (foundTask == NULL)
+            {
+                printf("Task named \"%s\" was not found.\n", name);
+            }
+            else
+            {
+                printf("\n%-5s %-30s %-18s %-10s\n", "ID", "Name", "Deadline", "Priority");
+                printf("------------------------------------------------------------------\n");
+                printf("%-5d %-30s %-18s %-10d\n",
+                       foundTask->id,
+                       foundTask->name,
+                       foundTask->deadline,
+                       foundTask->priority);
+            }
             break;
         case 0:
             running = 0;
             break;
+        default:
+            printf("Invalid option.\n");
+            break;
         }
-    }
-
-    if (saveTasks(taskList))
-    {
-        printf("Tasks saved. Goodbye.\n");
     }
 
     freeTasks(&taskList);
